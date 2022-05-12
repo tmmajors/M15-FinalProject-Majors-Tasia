@@ -1,28 +1,27 @@
 package com.company.FinalProject.ISS;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SpaceResponse {
 
-    @JsonProperty("iss_position")
-    private ISSPosition iss_position;
-    private double timestamp;
+    private IssCoordinates iss_position;
+    private String timestamp;
     private String message;
 
+
     // getters + setters
-    public ISSPosition getIss_position() {
+    public IssCoordinates getIss_position() {
         return iss_position;
     }
 
-    public void setIss_position(ISSPosition iss_position) {
+    public void setIss_position(IssCoordinates iss_position) {
         this.iss_position = iss_position;
     }
 
-    public double getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(double timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -33,5 +32,4 @@ public class SpaceResponse {
     public void setMessage(String message) {
         this.message = message;
     }
-
 }

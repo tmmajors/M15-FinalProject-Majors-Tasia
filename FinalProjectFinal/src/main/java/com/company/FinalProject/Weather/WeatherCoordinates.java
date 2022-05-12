@@ -2,23 +2,23 @@ package com.company.FinalProject.Weather;
 
 public class WeatherCoordinates {
 
-    private double longitude;
-    private double latitude;
+    private double longitude1;
+    private double latitude1;
 
     //getters + setters
-    public double getLongitude() {
-        return longitude;
+    public double getLongitude1() {
+        return longitude1;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setLongitude1(double longitude1) {
+        this.longitude1 = longitude1;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public double getLatitude1() {
+        return latitude1;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
+    public void setLatitude1(double latitude1) {
+        this.latitude1 = latitude1;
     }
 }

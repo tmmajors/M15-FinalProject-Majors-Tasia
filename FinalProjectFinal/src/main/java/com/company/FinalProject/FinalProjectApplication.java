@@ -21,41 +21,42 @@ public class FinalProjectApplication {
 
 		Scanner myScanner = new Scanner(System.in);
 
-		while (true) {
+		while (true){
+
 			//Menu
 			System.out.println("Menu");
-			System.out.println(" ");
-			//System.out.println("Please select an option from the menu below: ");
 			System.out.println(" ");
 			System.out.println("1. Local Weather");
 			System.out.println("2. ISS Location");
 			System.out.println("3. Weather at ISS Location");
 			System.out.println("4. Cryptocurrency Prices");
 			System.out.println("5. Exit");
+			System.out.println(" ");
 
-			int userInput;
-			
-			do {
+			int selection = 0;
+
+			//User Selection
+			do{
 				try {
 					System.out.println("Select a menu option: ");
-					userInput = Integer.parseInt(myScanner.nextLine());
+					selection = Integer.parseInt(myScanner.nextLine());
 				}
 				//if user enters a number out of range
 				catch (NumberFormatException e) {
-					userInput = 0;
+					selection = 0;
 				}
-				if (userInput < 1 || userInput > 5) {
+				if (selection < 1 || selection > 5) {
 					System.out.println("Error: Invalid selection, please enter an integer in between 1-5");
 				}
-			} while (userInput < 1 || userInput > 5);
+			} while (selection < 1 || selection > 5);
 
 			//switch statement for user choice
-			switch (userInput) {
+			switch (selection) {
 				case 1:
 					cityWeather();
 					break;
 				case 2:
-					getISSLocation(issLocationInfo());
+					issLocationInfo();
 					break;
 				case 3:
 					weatherInfo();
@@ -75,6 +76,7 @@ public class FinalProjectApplication {
 	//WEATHER
 	public static String userCity(){
 		Scanner scanner = new Scanner(System.in);
+		//System.out.println("Local Weather");
 		System.out.println("Enter city here: ");
 		return scanner.nextLine();
 	}
@@ -83,7 +85,6 @@ public class FinalProjectApplication {
 
 		WebClient client = WebClient.create(weatherURI);
 		WeatherResponse weatherResponse = null;
-
 		try {
 			Mono<WeatherResponse> response = client
 					.get()
@@ -108,14 +109,12 @@ public class FinalProjectApplication {
 	public static void weatherReport(WeatherResponse weatherResponse){
 		if (weatherResponse == null){
 			return;
-		}
-
-		//print weather info out
+		} //print weather info out
 		System.out.println(weatherResponse.getMain());
 		System.out.println("Current weather status: ");
 		System.out.println("Temperature: " + weatherResponse.getMain().getTemp());
 		System.out.println("Feels Like: " + weatherResponse.getMain().getFeels_like());
-		System.out.println("Max Temperature" + weatherResponse.getMain().getTemp_max() + " - " + weatherResponse.getMain().getTemp_min());
+		System.out.println("Max Temperature: " + weatherResponse.getMain().getTemp_max() + " - " + weatherResponse.getMain().getTemp_min());
 		System.out.println("Humidity: " + weatherResponse.getMain().getHumidity());
 	}
 
@@ -133,11 +132,10 @@ public class FinalProjectApplication {
 
 	//ISS
 	// Space API call
-	public static SpaceResponse getIssCoordinates() {
+	public static SpaceResponse getSpaceResponse() {
 
 		WebClient client = WebClient.create("http://api.open-notify.org/iss-now.json");
 		SpaceResponse spaceResponse = null;
-
 		try {
 			Mono<SpaceResponse> response = client
 					.get()
@@ -160,38 +158,37 @@ public class FinalProjectApplication {
 		return spaceResponse;
 	}
 
-	//calls location of ISS Response
-	public static void getISSLocation(SpaceResponse spaceResponse){
-		if (spaceResponse == null){
+	//ISS location info
+	public static void getISSLocation(SpaceResponse spaceResponse, WeatherResponse weatherResponse){
+		if (spaceResponse == null || weatherResponse == null){
 			System.out.println("Error: Location unknown, please enter city name here: ");
 			return;
 		}
-
-		System.out.println("ISS Coordinates: ");
-		System.out.println("Latitude: "  +  spaceResponse.setIss_position().getLatitude());
-		System.out.println("Longitude: "  +  spaceResponse.getIss_position().Longitude());
+		System.out.println("ISS Coordinates: " + "\n" + "Latitude: " + spaceResponse.getIss_position().latitude);
+		System.out.println("Longitude: "  +  spaceResponse.getIss_position().longitude);
+		//System.out.println("Location Info: " + weatherResponse.getName() + ", " + weatherResponse.getSystemInfo().getCountry());
 	}
 
 		//prints location + returns weather
-	public static SpaceResponse issLocationInfo(){
+	public static WeatherResponse issLocationInfo() {
 		SpaceResponse spaceResponse = getSpaceResponse();
-		getISSLocation(spaceResponse);
-		return spaceResponse;
+		WeatherResponse weatherResponse = null;
+		if (spaceResponse != null) {
+			String weatherURI = "https://api.openweathermap.org/data/2.5/weather?lat=" + spaceResponse.getIss_position().getLatitude() + "&lon=" + spaceResponse.getIss_position().getLongitude() + "&appid=5a5b62808ec829bf95a5338109de9cc2";
+			weatherResponse = getWeatherResponse(weatherURI);
+
+		}
+		getISSLocation(spaceResponse, weatherResponse);
+		return weatherResponse;
 	}
 
 	public static void weatherInfo(){
-		SpaceResponse spaceResponse = getSpaceResponse();
-		WeatherResponse weatherResponse = null;
-		if(spaceResponse != null){
-			String weatherURI = "https://api.openweathermap.org/data/2.5/weather?lat="+spaceResponse.getIss_position().getLatitude() + "&lon=" + spaceResponse.getIss_position().getLongitude() + "&appid=5a5b62808ec829bf95a5338109de9cc2";
-			weatherResponse = getWeatherResponse(weatherURI);
-			//method for weather goes here(weatherResponse);
-		}
+		WeatherResponse weatherResponse = issLocationInfo();
+		weatherReport(weatherResponse);
 	}
 
 
 	//CRYPTO
-	//gets user crypto input
 	public static String cryptoInput() {
 			System.out.println("Enter cryptocurrency symbol here: ");
 			Scanner myScanner = new Scanner(System.in);
@@ -238,7 +235,7 @@ public class FinalProjectApplication {
 		}
 		System.out.println("Cryptocurrency name: " + cryptoResponse.getName());
 		System.out.println("Cryptocurrency symbol: " + cryptoResponse.getAsset_id());
-		System.out.println("Current price: " + "USD $:" + "%.2f" + cryptoResponse.getPrice_usd());
+		System.out.println("Current price: USD$"  + ("%.2f" + cryptoResponse.getPrice_usd()));
 	}
 
 	//crypto API
